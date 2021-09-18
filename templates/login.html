@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<head>
+    <title>LOGIN PAGE</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.js" integrity="sha256-HwWONEZrpuoh951cQD1ov2HUK5zA5DwJ1DNUXaM6FsY=" crossorigin="anonymous"></script>
+</head>
+<body>
+    <form method="post" action="{{url_for('login')}}">
+        <label for="email">Email</label><br>
+        <input type="email" name="email" placeholder="abc@xyz.com"><br>
+        <label for="password">Password</label><br>
+        <input type="password" name="password" placeholder="password"><br>
+        <input type="submit" name="submit" id="login" value="Login">
+    </form>
+</body>

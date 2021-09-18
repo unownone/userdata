@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<head>
+    <title>SIGN UP PAGE</title>
+</head>
+<body>
+    <form action="{{url_for('signup')}}" method="post">
+        <label for="email">Email</label><br>
+        <input type="email" name="email" placeholder="abc@xyz.com"><br>
+        <label for="email">username</label><br>
+        <input type="username" name="username" placeholder="your username"><br>
+        <label for="password">Password</label><br>
+        <input type="password" name="password" id="pass"><br>
+        <label for="password">Confirm Password</label><br>
+        <input type="password" name="confirm_password" id="altpass"><br>
+        <p id="disp"></p>
+        <label for="Address">Address:</label>
+        <input type="textbox" name="address"><br>
+        <input type="submit" name="submit" value="Login">
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $("#altpass").focus(function(){
+                    if($("#altpass").val()!=$("#pass").val()){
+                        $("#disp").val("Passwords do not match");
+                    }
+                });
+            });
+        </script>
+    </form>
+</body>
