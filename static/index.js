@@ -1,21 +1,51 @@
-let user;
+
 $(document).ready(function(){
-    $("#search").click(function(){
-        const username=$("#usr").val();
+    $("#signout").click(function(){
+        document.cookie = "x-access-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+        window.location.href='/';
+    });
         const options = {
             method:"GET",
             headers:{'x-access-token':getCookie('x-access-token')}
         }
-        console.log(options);
-        fetch('/user?'+new URLSearchParams({username:username}),options)
+        fetch('/user',options)
             .then(data =>data.json())
             .then(data=>{
-                $("#data").html("");
+                $("#myform").html("");
                 for(const key in data){
-                    console.log(1);
-                $("#data").append("<p>"+key+" : "+data[key]+"</p>");}
+                $("#myform").append("<p>"+key+" : "+"<input type='text' name='"+key+"' value='"+data[key]+"'></p>");
+            }
+            $("#myform").append("<input type='submit' id='submit' value='Save'>");
             });
-    });
+        
+        $("#delete").submit(function(){
+            var val = $("#delete").serializeArray();
+            var options = {
+                method:"GET",
+                headers:{'x-access-token':getCookie('x-access-token')},
+                body:val
+            }
+            fetch('/delete',options).then(data => data.json()).then(data=>{
+                window.location.href='/';
+            });
+        });
+
+        $("#myform").submit(function(){
+            var val = $("#myform").serializeArray();
+            let vall={};
+            for(var i=0;i<val.length;i++){
+                vall[val[i].name]=val[i].value
+            }
+            var options = {
+                method:"GET",
+                headers:{'x-access-token':getCookie('x-access-token')},
+            }
+            let data =fetch('/update?'+new URLSearchParams(vall),options).then(data=>data.json());
+            console.log(data);
+            for(const key in data){
+                $("#data").append("<p>"+key+" : "+data[key]+"</p>");
+            }
+        });
 });
 
 function getCookie(cname) {

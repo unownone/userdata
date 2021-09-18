@@ -14,6 +14,10 @@ app.config.from_object(Config)
 mongo = PyMongo(app)
 user_db = mongo.db.user.user_data
 
+def get_id(token):
+    data = jwt.decode(token,app.config['SECRET_KEY'],algorithms=['HS256'])
+    return data['id']
+
 def get_token(id):
     token = jwt.encode({
     'id':id,
@@ -48,18 +52,38 @@ def token_required(f):
 @app.route('/')
 def red(): return redirect('login')
 
+
+
+@app.route('/update',methods=['GET'])
+@token_required
+def update():
+    data = request.args.to_dict()
+    token =  request.headers['x-access-token']
+    data = user_db.find_one_and_update({'id':get_id(token)},{'$set':{"email":data['email'],"username":data['username'],"address":data['address']}})
+    data = jsonify({"respone":"user updated"})
+    return data
+
+
+
+@app.route('/delete',methods=['GET'])
+@token_required
+def delete():
+    token = renew_token()
+    user_db.delete_one({"id":get_id(token)})
+    return redirect(url_for('signup'))
+
+
 @app.route('/user',methods=['GET'])
 @token_required
 def get_user():
-    username = request.args.get('username')
-    print("\n\n\n\n\n",username,"\n\n\n\n\n\n")
-    data = user_db.find_one({'username':username})
+    token = renew_token()
+    data = user_db.find_one({'id':get_id(token)})
     if data is None:
         return jsonify({'message':'User does not exist'})
     else:
-        print(data['email'])
+        print(data)
         data = jsonify(objidconv(data))
-        data.set_cookie('x-access-token',renew_token())
+        data.set_cookie('x-access-token',token)
         return data
 
 @app.route('/getuser',methods=['GET'])
@@ -105,16 +129,17 @@ def signup():
         data = request.form
     
         # gets name, email and password
-        username, email = data.get('username'), data.get('email')
+        username, email,address = data.get('username'), data.get('email'),data.get('address')
         password = data.get('password')
     
         # checking for existing user
         user = user_db.find_one({"$or":[{"username":username},{"email":email}]})
         if not user:
             # database ORM object
-            user_db.insert_one({"id":str(uuid.uuid4()),"email":email, "username":username, "password":generate_password_hash(password)})
+            id= str(uuid.uuid4())
+            user_db.insert_one({"id":id,"email":email, "username":username, "password":generate_password_hash(password),"address":address,"userdata":[]})
             resp = redirect('getuser')
-            resp.set_cookie('x-access-token',get_token(user['id']))
+            resp.set_cookie('x-access-token',get_token(id))
             return resp
         else:
             # returns 202 if user already exists
