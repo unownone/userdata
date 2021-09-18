@@ -16,6 +16,7 @@
         <label for="Address">Address:</label>
         <input type="textbox" name="address"><br>
         <input type="submit" name="submit" value="Login">
+
         <script type="text/javascript">
             $(document).ready(function(){
                 $("#altpass").focus(function(){
@@ -26,4 +27,6 @@
             });
         </script>
     </form>
+    <a href="{{url_for('login')}}">Sign in instead</a>
+
 </body>
